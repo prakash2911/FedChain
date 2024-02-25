@@ -1,0 +1,8 @@
+pip
+web3
+eth-tester[py-evm]
+py-solc-x
+numpy
+scikit-learn
+pandas
+tqdm
