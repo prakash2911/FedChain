@@ -10,6 +10,9 @@ class config:
     INPUT_SIZE = 118
     ENCODING_SIZE = 20
     NUM_CLASSES = 2
-    Train= 'dataset/train/train_data.csv'
+    Train= 'dataset/train/'
     Test= 'dataset/test/test_data.csv'
-    DatasetPath='dataset/DatasetPKL/'
+    DatasetPath='dataset/nid.csv'
+    initialTrain = 'dataset/train/data1.csv'
+    ModeName = 'Autoencoder'
+    NUM_DATA = 5

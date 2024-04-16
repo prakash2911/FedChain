@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 from sklearn.compose import ColumnTransformer
 import pandas as pd
 import numpy as np
-from imblearn.over_sampling import SMOTE
+# from imblearn.over_sampling import SMOTE
 import torch
 from dataclasses import dataclass,asdict
 import json
@@ -35,10 +35,8 @@ class Dataset:
         return  pickle.dumps(self.to_dict())
 
 def PreProcess(path):
-    dataset = pd.read_csv(path)
-    X = dataset.iloc[:, :-1].values
-    Y = dataset.iloc[:, -1].values
-    
+   
+    X, Y = split_dataset(path)
     # Encode categorical data
     categorical_features = [i for i, e in enumerate(X[0]) if isinstance(e, str)]
     column_transformer = ColumnTransformer([("categorical", OneHotEncoder(), categorical_features)], remainder="passthrough")
@@ -53,34 +51,41 @@ def PreProcess(path):
     X = x_scaler.fit_transform(X)
     
     # Apply SMOTE to balance the dataset
-    smote = SMOTE(random_state=0)
-    X, Y = smote.fit_resample(X, Y)
+    # smote = SMOTE(random_state=0)
+    # X, Y = smote.fit_resample(X, Y)
     
     return X, Y
 
+def split_dataset(path):
+    dataset = pd.read_csv(path)
+    X = dataset.iloc[:, :-1].values
+    Y = dataset.iloc[:, -1].values
+    return X , Y
 
-
-def load_dataset(trainfile,testfile,percentage, BATCH_SIZE):
+def load_dataset(trainfile,testfile, BATCH_SIZE):
    
-    X_train, Y_train = PreProcess(trainfile)
-    X_test, Y_test = PreProcess(testfile)
+    X_train, Y_train = split_dataset(trainfile)
+    X_test, Y_test = split_dataset(testfile)
     num_train_data = X_train.shape[0]
     num_features = X_train.shape[1]
     num_labels = 2
 
     train_dataset = TensorDataset(
-            torch.tensor(X_train, dtype=torch.float32),
-            torch.tensor(Y_train, dtype=torch.float32))
+            torch.tensor(X_train, dtype=torch.float64),
+            torch.tensor(Y_train, dtype=torch.float64))
     test_dataset = TensorDataset(
-            torch.tensor(X_test, dtype=torch.float32),
-            torch.tensor(Y_test, dtype=torch.float32))
-    trainData = split_data_equal(train_dataset, percentage, BATCH_SIZE)
+            torch.tensor(X_test, dtype=torch.float64),
+            torch.tensor(Y_test, dtype=torch.float64))
+    
+    # trainData = split_data_per(train_dataset, percentage, BATCH_SIZE)
+    trainData = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False)
     testData = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    
     return Dataset(train=trainData, test=testData, num_train_data=num_train_data, num_features=num_features, num_labels=num_labels)
 
 
 
-def split_data_equal(dataset, Percentage, BATCH_SIZE):
+def split_data_per(dataset, Percentage, BATCH_SIZE):
         
     chunk_size = math.floor( len(dataset) * (Percentage / 100))
     print(chunk_size)
@@ -90,4 +95,20 @@ def split_data_equal(dataset, Percentage, BATCH_SIZE):
     dataloaders = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler)
     remaining = list(set(remaining) - set(indices))
     print(len(dataloaders.dataset))
+    return dataloaders
+
+def split_data_equal(dataset, groups, BATCH_SIZE):
+    """
+    Split the given dataset to the given number of equal parts.
+    Returns a list of dataloaders.
+    """
+    chunk_size = len(dataset) // groups
+    # group_indices = []
+    dataloaders = []
+    remaining = np.arange(len(dataset))
+    for i in range(groups):
+        indices = np.random.choice(remaining, chunk_size, replace=False)
+        sampler = SubsetRandomSampler(indices)
+        dataloaders.append(DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, sampler=sampler))
+        remaining = list(set(remaining) - set(indices))
     return dataloaders
