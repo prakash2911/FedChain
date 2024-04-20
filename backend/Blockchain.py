@@ -3,7 +3,7 @@ import time
 import json
 
 class ModelTransaction:
-    def __init__(self, model_bytes, mean, std_dev,size=0):
+    def __init__(self, model_bytes, mean=[], std_dev=[],size=0):
         self.model_bytes = model_bytes
         self.mean = mean
         self.std_dev = std_dev

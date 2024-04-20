@@ -16,4 +16,3 @@ class config:
     NUM_DATA = 5
     certificate = './ssl/certificate.pem'
     private_key = './ssl/private_key.pem'
-    relayChain = 'https://localhost:5000'
