@@ -33,17 +33,19 @@ def train_model(model, train_loader, num_epochs, learning_rate, mean, standard_d
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}')
 
 # Define the evaluation function
-def evaluate_model(model, test_loader,block_data):
+def evaluate_model(model, test_loader,block_data=None):
     model.eval()
     correct = 0
     total = 0
     size,mean,std = localStatistics(test_loader)
-    mean = Combined_Mean(mean, size ,block_data['mean'],block_data['size']) 
-    std = Combined_Std(std, size, block_data['std_dev'], block_data['size'])
+    if block_data:
+        mean = Combined_Mean(mean, size ,block_data['mean'],block_data['size']) 
+        std = Combined_Std(std, size, block_data['std_dev'], block_data['size'])
     
     with torch.no_grad():
         for inputs, targets in test_loader:
-            inputs_normalized = (inputs - mean) / std
+            if block_data:
+                inputs_normalized = (inputs - mean) / std
             
             classifications = model(inputs.float())
             predicted = torch.argmax(classifications, 1)
@@ -51,3 +53,5 @@ def evaluate_model(model, test_loader,block_data):
             correct += (predicted == targets).sum().item()
     accuracy = correct / total
     return accuracy
+def validateModel(before,after):
+    if before
