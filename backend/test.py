@@ -8,7 +8,7 @@ blockchain = Blockchain()
 
 def localUpdate():
     per = 20
-    dataset  = load_dataset(config.Train,config.Test,per,config.BATCH_SIZE)
+    dataset  = load_dataset(config.Train,config.Test,config.BATCH_SIZE)
 
     size,mean,std = localStatistics(dataset.train)
     last_block = blockchain.chain[-1]
@@ -22,7 +22,7 @@ def localUpdate():
         }
     mean = Combined_Mean(mean, size ,block_data['mean'],block_data['size']) 
     std = Combined_Std(std, size, block_data['std_dev'], block_data['size'])
-    autoencoder = AutoencoderWithClassifier(config.INPUT_SIZE, config.ENCODING_SIZE, config.NUM_CLASSES)
+    autoencoder = AutoencoderWithClassifier(config.INPUT_SIZE, config.NUM_CLASSES)
     train_model(autoencoder, dataset.train, config.NUM_EPOCHS, config.LEARNING_RATE, mean, std)
     evaluate_model(autoencoder, dataset.test,block_data)
     weight = size / (size + block_data['size'])
@@ -42,7 +42,7 @@ def localUpdate():
     
     
 if __name__ == "__main__":
-    global_model = AutoencoderWithClassifier(config.INPUT_SIZE, config.ENCODING_SIZE, config.NUM_CLASSES)
+    global_model = AutoencoderWithClassifier(config.INPUT_SIZE, config.NUM_CLASSES)
     model_tx = ModelTransaction(global_model.to_bytes(), np.zeros((1, 118), dtype=np.float64), np.ones((1, 118), dtype=np.float64) )
     blockchain.add_transaction(model_tx)
     blockchain.mine_block()

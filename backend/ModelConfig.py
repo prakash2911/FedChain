@@ -3,23 +3,24 @@ import torch.nn.functional as F
 import torch
 from FederatedLearning import FederatedModel
 class AutoencoderWithClassifier(FederatedModel):
-    def __init__(self, input_size, num_classes ,args):
+    def __init__(self, input_size, num_classes ):
         super().__init__()
         self.MODEL_NAME = "AutoEncoder"
+        self.encoding_size = 32
         self.encoder = nn.Sequential(
             nn.Linear(input_size, 64),
             nn.ReLU(True),
             nn.Linear(64, 32),
             nn.ReLU(True),
-            nn.Linear(32, args['encoding_size']),
+            nn.Linear(32, self.encoding_size),
         )
         self.classifier = nn.Sequential(
-            nn.Linear(args['encoding_size'], 16),
+            nn.Linear(self.encoding_size, 16),
             nn.ReLU(True),
             nn.Linear(16, num_classes)
         )
         self.decoder = nn.Sequential(
-            nn.Linear(args['encoding_size'], 32),
+            nn.Linear(self.encoding_size, 32),
             nn.ReLU(True),
             nn.Linear(32, 64),
             nn.ReLU(True),
@@ -39,7 +40,7 @@ class AutoencoderWithClassifier(FederatedModel):
 
 
 class LSTMModel(FederatedModel):
-    def __init__(self, num_features,num_labels, args):
+    def __init__(self, num_features,num_labels):
         super().__init__()
         self.MODEL_NAME = "LSTMModel"
         hidden_size = 64  # Number of features in the hidden state
@@ -62,9 +63,9 @@ class LSTMModel(FederatedModel):
 
 class SingleLayer(FederatedModel):
     
-    def __init__(self, num_features, num_labels, args):
+    def __init__(self, num_features, num_labels):
         super().__init__()
-        n = args.getint("neuron count")
+        n = 5
         self.fc1 = nn.Linear(num_features, n)
         self.fc2 = nn.Linear(n, num_labels)
 
@@ -75,7 +76,7 @@ class SingleLayer(FederatedModel):
 
 
 class DBN(FederatedModel):
-    def __init__(self, num_features, num_labels,args):
+    def __init__(self, num_features, num_labels):
         super().__init__()
         self.MODEL_NAME = "DBN"
         self.num_layers = 3

@@ -54,12 +54,24 @@ def mine_block():
     response = {'message': 'Block mined successfully!'}
     return jsonify(response), 200
 
-@app.route('/chain', methods=['GET'])
-def get_chain():
-    chain_data = []
+@app.route('/blocks', methods=['GET'])
+def get_blocks():
+    blocks_data = []
+    
     for block in blockchain.chain:
-        chain_data.append(block.to_dict())
-    response = {'chain': chain_data, 'length': len(chain_data)}
+        block_data = {
+            'hash': block.hash,
+            'previous_hash': block.previous_hash,
+            'timestamp': block.timestamp,
+            'transactions': [tx.to_dict() for tx in block.transactions]
+        }
+        blocks_data.append(block_data)
+    
+    response = {
+        'length': len(blockchain.chain),
+        'blocks': blocks_data
+    }
+    
     return jsonify(response), 200
 
 
@@ -82,20 +94,23 @@ def localUpdate():
         model = ModelConfig.__dict__[config.ModeName]
     except KeyError:
         sys.exit(1)
-    gobal_model = model(config.INPUT_SIZE, config.NUM_CLASSES, config.ENCODING_SIZE)
+    gobal_model = model(config.INPUT_SIZE, config.NUM_CLASSES )
     gobal_model.from_bytes(block_data['model_bytes'])
     response['before'] = evaluate_model(gobal_model, dataset.test,block_data)
     mean = Combined_Mean(mean, size ,block_data['mean'],block_data['size']) 
     std = Combined_Std(std, size, block_data['std_dev'], block_data['size'])
-    autoencoder = model(config.INPUT_SIZE,config.NUM_CLASSES,config.ENCODING_SIZE)
+    autoencoder = model(config.INPUT_SIZE,config.NUM_CLASSES)
     train_model(autoencoder, dataset.train, config.NUM_EPOCHS, config.LEARNING_RATE, mean, std)
     weight = size / (size + block_data['size'])
     autoencoder.federate_from_bytes(block_data['model_bytes'],weight)
     response['after'] = evaluate_model(autoencoder, dataset.test,block_data)    
-    model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'] )
-    blockchain.add_transaction(model_tx)
-    
-    return response, 200
+    if abs(response['before'] - response['after']) < config.THRESHOLD:
+        return response, 200
+    else:
+        model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'] )
+        blockchain.add_transaction(model_tx)
+        
+        return response, 200
 
 
 blockchain = Blockchain()
@@ -119,7 +134,7 @@ if __name__ == "__main__":
         print(e)
         sys.exit(1)
 
-    global_model = model(config.INPUT_SIZE, config.NUM_CLASSES , config.ENCODING_SIZE)
+    global_model = model(config.INPUT_SIZE, config.NUM_CLASSES )
     train_model(global_model, dataset.train, config.NUM_EPOCHS, config.LEARNING_RATE,mean,std)
     model_tx = ModelTransaction(global_model.to_bytes(),mean, std,size )
     blockchain.add_transaction(model_tx)

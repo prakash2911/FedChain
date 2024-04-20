@@ -15,7 +15,7 @@ def train_model(model, train_loader, num_epochs, learning_rate, mean, standard_d
             inputs_normalized = (inputs - mean) / standard_deviation
             
             optimizer.zero_grad()
-            classifications = model(inputs.float())
+            classifications = model(inputs_normalized.float())
             
             
             
@@ -47,11 +47,9 @@ def evaluate_model(model, test_loader,block_data=None):
             if block_data:
                 inputs_normalized = (inputs - mean) / std
             
-            classifications = model(inputs.float())
+            classifications = model(inputs_normalized.float())
             predicted = torch.argmax(classifications, 1)
             total += targets.size(0)
             correct += (predicted == targets).sum().item()
     accuracy = correct / total
     return accuracy
-def validateModel(before,after):
-    if before
