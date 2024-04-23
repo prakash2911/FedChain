@@ -76,7 +76,7 @@ class Blockchain:
 
     def mine_block(self):
         last_block = self.chain[-1]
-        new_block = Block(self.transactions, last_block.hash,last_block.block_number,self.transactions[0].from_address,self.transactions[0].to_address)
+        new_block = Block(self.transactions, last_block.hash,last_block.block_number,last_block.from_address,last_block.to_address)
         self.chain.append(new_block)
         self.transactions = []
 

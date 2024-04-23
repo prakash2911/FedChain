@@ -21,6 +21,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route('/send_data', methods=['POST'])
 @cross_origin()
 def send_data():
+    global blockchain
+    
     last_block = blockchain.chain[-1]
     response = {}
     if last_block.transactions:
@@ -54,6 +56,8 @@ def send_data():
 @app.route('/testmodel', methods=['GET','POST'])
 @cross_origin()
 def evaluated():
+    global blockchain
+    
     response = {}
     last_block = blockchain.chain[-1]
     model = ModelConfig.__dict__[config.ModeName]
@@ -65,6 +69,7 @@ def evaluated():
 @app.route('/mine', methods=['GET'])
 @cross_origin()
 def mine_block():
+    global blockchain
     blockchain.mine_block()
     response = {'message': 'Block mined successfully!'}
     return jsonify(response), 200
@@ -72,6 +77,8 @@ def mine_block():
 @app.route('/blocks', methods=['GET'])
 @cross_origin()
 def get_blocks():
+    global blockchain
+    
     blocks_data = []
     
     for block in blockchain.chain:
@@ -100,6 +107,7 @@ def get_blocks():
 @app.route('/localupdate', methods=['GET','POST'])
 @cross_origin()
 def localUpdate():
+    global blockchain
     data = request.get_json()
     dataset  = load_dataset(f'{config.Train}/{data["dataset"]}',config.Test,config.BATCH_SIZE)
     response = {}
@@ -129,7 +137,7 @@ def localUpdate():
     response['after'] = evaluate_model(autoencoder, dataset.test,block_data)   
     host_ip = socket.gethostbyname(socket.gethostname()) 
     client_ip = request.remote_addr
-    if abs(response['before'] - response['after']) < config.THRESHOLD:
+    if abs(response['before'] - response['after']) > config.THRESHOLD:
         return response, 200
     else:
         model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
@@ -139,7 +147,7 @@ def localUpdate():
     # model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
     # blockchain.add_transaction(model_tx)
     # blockchain.mine_block()
-    return response, 200
+    # return response, 200
 
 blockchain = Blockchain()
 
