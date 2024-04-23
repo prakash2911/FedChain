@@ -34,11 +34,12 @@ class Block:
         self.gas_used = gas_used
         self.from_address =  from_address
         self.to_address = to_address
-        self.hash = self.calculate_hash()
         self.type = '0x2'
         self.status = 1
         self.contract_address = ''
         self.logs = ()
+        self.hash = self.calculate_hash()
+       
         
         
         
@@ -51,7 +52,7 @@ class Block:
             'block_number': self.block_number,
             'gas_used': self.gas_used,
             'contract_address': self.contract_address,
-            'logs': self.logs,
+            'logs':self.logs,
             'type': self.type,
             'from_address': self.from_address,
             'to_address': self.to_address,
