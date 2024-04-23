@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 import requests
 import ModelConfig
 from config import config 
@@ -14,8 +15,11 @@ import os
 import socket
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/send_data', methods=['POST'])
+@cross_origin()
 def send_data():
     last_block = blockchain.chain[-1]
     response = {}
@@ -46,15 +50,27 @@ def send_data():
     )
     
     return jsonify(response), res.status_code    
-    
+
+@app.route('/testmodel', methods=['GET','POST'])
+@cross_origin()
+def evaluated():
+    response = {}
+    last_block = blockchain.chain[-1]
+    model = ModelConfig.__dict__[config.ModeName]
+    model.from_bytes(last_block.transactions[-1].model_bytes)
+    dataset  = load_dataset(config.Test,config.BATCH_SIZE)
+    response['accuracy'] = evaluate_model(model,dataset.test,last_block.transactions[-1])
+    return jsonify(response), 200
 
 @app.route('/mine', methods=['GET'])
+@cross_origin()
 def mine_block():
     blockchain.mine_block()
     response = {'message': 'Block mined successfully!'}
     return jsonify(response), 200
 
 @app.route('/blocks', methods=['GET'])
+@cross_origin()
 def get_blocks():
     blocks_data = []
     
@@ -70,7 +86,6 @@ def get_blocks():
             'from_address': block.from_address,
             'to_address': block.to_address,
             'status': block.status,
-            # 'transactions': [tx.to_dict() for tx in block.transactions]
         }
         blocks_data.append(block_data)
     
@@ -83,6 +98,7 @@ def get_blocks():
 
 
 @app.route('/localupdate', methods=['GET','POST'])
+@cross_origin()
 def localUpdate():
     data = request.get_json()
     dataset  = load_dataset(f'{config.Train}/{data["dataset"]}',config.Test,config.BATCH_SIZE)
@@ -113,14 +129,16 @@ def localUpdate():
     response['after'] = evaluate_model(autoencoder, dataset.test,block_data)   
     host_ip = socket.gethostbyname(socket.gethostname()) 
     client_ip = request.remote_addr
-    # if abs(response['before'] - response['after']) < config.THRESHOLD:
-    #     return response, 200
-    # else:
-    #     model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
-    #     blockchain.add_transaction(model_tx)
-    #     return response, 200
-    model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
-    blockchain.add_transaction(model_tx)
+    if abs(response['before'] - response['after']) < config.THRESHOLD:
+        return response, 200
+    else:
+        model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
+        blockchain.add_transaction(model_tx)
+        blockchain.mine_block()
+        return response, 200
+    # model_tx = ModelTransaction(autoencoder.to_bytes(), mean, std,size+block_data['size'],host_ip,client_ip )
+    # blockchain.add_transaction(model_tx)
+    # blockchain.mine_block()
     return response, 200
 
 blockchain = Blockchain()

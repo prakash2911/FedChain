@@ -10,8 +10,9 @@ export default class APIService {
           "Access-Control-Allow-Origin": "*",
           Accept: "application/json",
         },
+        
       });
-
+      
       return await response.json();
     } catch (error) {
       console.error(error);

@@ -24,7 +24,10 @@ export default function ParaChain() {
 
   const updateLogs = () => {
     APIService.GetData("blocks").then((data) => {
+      console.log(data.blocks);
+      
       setLogs(data.blocks);
+
     });
   };
 
@@ -36,6 +39,7 @@ export default function ParaChain() {
       setState("completed");
       setTimeout(() => setState("initial"), 8000);
       setScores(newScores);
+      updateLogs();
     });
   };
 
@@ -44,6 +48,7 @@ export default function ParaChain() {
     APIService.GetData("mine").then((data) => {
       // console.log(data);
       setState("completed");
+      updateLogs();
       setTimeout(() => setState("initial"), 8000);
     });
   };
