@@ -8,10 +8,7 @@ class config:
     INPUT_SIZE = 118
     ENCODING_SIZE = 20
     NUM_CLASSES = 2
-    Train= 'dataset/train/'
-    Test= 'dataset/test/test_data.csv'
-    DatasetPath='dataset/nid.csv'
-    initialTrain = 'dataset/train/data1.csv'
+    Test= 'dataset/test_data.csv'
     ModeName = 'LSTMModel'
     NUM_DATA = 5
     certificate = './ssl/certificate.pem'

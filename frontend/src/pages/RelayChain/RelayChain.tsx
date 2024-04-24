@@ -28,7 +28,7 @@ export default function RelayChain() {
   };
 
   const initiateEvaluation = () => {
-    APIService.GetData(BASE_URL.concat("testmodel")).then((data) => {
+    APIService.PostData(BASE_URL.concat("testModel"),{}).then((data) => {
       setEvaluateScore(fs(data.accuracy));
       updateLogs();
     });
