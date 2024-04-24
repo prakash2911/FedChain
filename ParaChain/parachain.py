@@ -46,7 +46,7 @@ def send_data():
         },verify=False
     )
     
-    return jsonify(res), res.status_code    
+    return jsonify({"message": "bruh"}), res.status_code    
 
 
 @app.route('/testmodel', methods=['GET','POST'])

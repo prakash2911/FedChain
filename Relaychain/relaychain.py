@@ -1,14 +1,19 @@
 from flask import Flask, request, jsonify,send_file
+from flask_cors import CORS, cross_origin
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from config import config
 from Blockchain import Blockchain, ModelTransaction
+
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Load keys
 
 @app.route('/get_public_key', methods=['GET'])
+@cross_origin()
 def get_public_key():  
     return send_file(
         './keys/public_key.pem',
@@ -18,6 +23,7 @@ def get_public_key():
     )
     
 @app.route('/verify_decrypt_and_read', methods=['POST'])
+@cross_origin()
 def verify_decrypt_and_read():
     with open('./keys/private_key.pem', 'rb') as f:
         private_key = serialization.load_pem_private_key(
@@ -44,15 +50,25 @@ def verify_decrypt_and_read():
     blockchain.mine_block()
     return jsonify({'message': 'Transaction added and block mined successfully!'}), 200
 
-@app.route('/chain', methods=['GET'])
-def get_chain():
-    chain_data = []
-    for block in blockchain.chain:
-        chain_data.append(block.__dict__)
-    return jsonify({
-        'length': len(chain_data),
-        'chain': chain_data,
-    }), 200
+@app.route('/blocks', methods=['GET'])
+@cross_origin()
+def get_blocks():
+    global Blockchain
+    blocks_data = []
+    for block in Blockchain.chain:
+        block_data = {
+            'hash': block.hash,
+            'previous_hash': block.previous_hash,
+            'timestamp': block.timestamp,
+        }
+        blocks_data.append(block_data)
+    
+    response = {
+        'length': len(Blockchain.chain),
+        'blocks': blocks_data
+    }
+    
+    return jsonify(response), 200
         
 blockchain = Blockchain()    
 if __name__ == '__main__':

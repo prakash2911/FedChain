@@ -101,11 +101,11 @@
 }
 
 .page-container > .right > .btns-wrapper > button:first-child {
-  border-radius: 8px 8px 0px 0px !important;
+  border-radius: 8px 8px 0px 0px;
 }
 
 .page-container > .right > .btns-wrapper > button:last-child {
-  border-radius: 0px 0px 8px 8px !important;
+  border-radius: 0px 0px 8px 8px;
 }
 
 .page-container > .right button {

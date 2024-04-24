@@ -1,9 +1,7 @@
-const url: string = "https://127.0.0.1:3001/";
-
 export default class APIService {
-  static async GetData(route: string): Promise<any> {
+  static async GetData(url: string): Promise<any> {
     try {
-      const response: Response = await fetch(url.concat(route), {
+      const response: Response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -20,9 +18,9 @@ export default class APIService {
     }
   }
 
-  static async PostData(route: string, body: any): Promise<any> {
+  static async PostData(url: string, body: any): Promise<any> {
     try {
-      const response: Response = await fetch(url.concat(route), {
+      const response: Response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
