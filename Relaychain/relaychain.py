@@ -53,9 +53,9 @@ def verify_decrypt_and_read():
 @app.route('/blocks', methods=['GET'])
 @cross_origin()
 def get_blocks():
-    global Blockchain
+    global blockchain
     blocks_data = []
-    for block in Blockchain.chain:
+    for block in blockchain.chain:
         block_data = {
             'hash': block.hash,
             'previous_hash': block.previous_hash,
@@ -64,7 +64,7 @@ def get_blocks():
         blocks_data.append(block_data)
     
     response = {
-        'length': len(Blockchain.chain),
+        'length': len(blockchain.chain),
         'blocks': blocks_data
     }
     
