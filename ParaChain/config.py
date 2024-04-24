@@ -17,3 +17,4 @@ class config:
     certificate = './ssl/certificate.pem'
     private_key = './ssl/private_key.pem'
     relayChain = 'https://localhost:5000'
+    blockchain = 'https://localhost:3000'

@@ -82,6 +82,7 @@ def load_dataset(trainfile,testfile, BATCH_SIZE):
     testData = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
     
     return Dataset(train=trainData, test=testData, num_train_data=num_train_data, num_features=num_features, num_labels=num_labels)
+
 def load_test_dataset(testfile, BATCH_SIZE):
     X_test, Y_test = split_dataset(testfile)
     num_test_data = X_test.shape[0]

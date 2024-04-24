@@ -2,7 +2,7 @@ from ModelConfig import AutoencoderWithClassifier
 from config import config 
 from utils import *
 from dataPreProcess import load_dataset
-from Blockchain import Blockchain, ModelTransaction,Block
+from blockchain.Blockchain import Blockchain, ModelTransaction,Block
 from model import *
 blockchain = Blockchain()
 

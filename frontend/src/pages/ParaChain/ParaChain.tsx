@@ -155,13 +155,13 @@ export default function ParaChain() {
           >
             Initiate Training
           </button>
-          <button
+          {/* <button
             className="mine-btn"
             onClick={initiateMining}
             disabled={state !== "initial"}
           >
             Mine
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
