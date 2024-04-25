@@ -132,3 +132,22 @@
 .page-container > .right .mine-btn:hover {
   background-color: var(--color-textWhite);
 }
+
+.page-container > .right > .status {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+  align-items: center;
+  cursor: pointer;
+}
+
+.page-container > .right > .status > .icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.page-container > .right > .status > .icon[data-connected="1"] {
+  background-color: green;
+}

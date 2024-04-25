@@ -19,6 +19,7 @@ const BASE_URL: string = "https://127.0.0.1:3001/";
 
 export default function ParaChain() {
   const [logs, setLogs] = useState<LogInterface[]>([]);
+  const [connected, setConnected] = useState(false);
   const [mode, setMode] = useState("train");
 
   const [selectedModel, setSelectedModel] = useState(models[0]);
@@ -35,10 +36,17 @@ export default function ParaChain() {
 
   const updateLogs = () => {
     APIService.GetData(BASE_URL.concat("blocks")).then((data) => {
-      console.log(data.blocks);
-
       setLogs(data.blocks);
     });
+  };
+
+  const updateConnectionStatus = () => {
+    APIService.GetData(BASE_URL.concat("status"))
+      .then(() => setConnected(true))
+      .catch((err) => {
+        console.log(err);
+        setConnected(false);
+      });
   };
 
   const initiateTraining = () => {
@@ -71,7 +79,7 @@ export default function ParaChain() {
 
   const initiateSend = () => {
     APIService.PostData(BASE_URL.concat("send_data"), {});
-  }
+  };
 
   useEffect(() => {
     updateLogs();
@@ -92,6 +100,10 @@ export default function ParaChain() {
         </div>
       </div>
       <div className="right">
+        <div className="status noselect" onClick={updateConnectionStatus}>
+          <div data-connected={connected ? "1" : "0"} className="icon" />
+          {connected ? "Connected" : "Disconnected"}
+        </div>
         <div className="animated-image">
           {state === "initial" && (
             <Lottie animationData={LearningRobot} loop={true} />

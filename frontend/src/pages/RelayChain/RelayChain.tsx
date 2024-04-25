@@ -17,18 +17,27 @@ const BASE_URL: string = "https://127.0.0.1:5000/";
 
 export default function RelayChain() {
   const [logs, setLogs] = useState<LogInterface[]>([]);
+  const [connected, setConnected] = useState(false);
 
   const [evaluateScore, setEvaluateScore] = useState<number>();
 
   const updateLogs = () => {
     APIService.GetData(BASE_URL.concat("blocks")).then((data) => {
-      console.log(data);
       setLogs(data.blocks);
     });
   };
 
+  const updateConnectionStatus = () => {
+    APIService.GetData(BASE_URL.concat("status"))
+      .then(() => setConnected(true))
+      .catch((err) => {
+        console.log(err);
+        setConnected(false);
+      });
+  };
+
   const initiateEvaluation = () => {
-    APIService.PostData(BASE_URL.concat("testModel"),{}).then((data) => {
+    APIService.PostData(BASE_URL.concat("testModel"), {}).then((data) => {
       setEvaluateScore(fs(data.accuracy));
       updateLogs();
     });
@@ -36,6 +45,7 @@ export default function RelayChain() {
 
   useEffect(() => {
     updateLogs();
+    updateConnectionStatus();
   }, []);
 
   return (
@@ -53,6 +63,13 @@ export default function RelayChain() {
         </div>
       </div>
       <div className="right">
+        <div className="status noselect" onClick={updateConnectionStatus}>
+          <div
+            data-connected={connected ? "1" : "0"}
+            className="icon"
+          />
+          {connected ? "Connected" : "Disconnected"}
+        </div>
         <div className="animated-image">
           <Lottie animationData={LearningRobot} loop={true} />
         </div>
@@ -96,10 +113,7 @@ export default function RelayChain() {
           </div>
         )}
         <div className="btns-wrapper">
-          <button
-            className="training-btn"
-            onClick={initiateEvaluation}
-          >
+          <button className="training-btn" onClick={initiateEvaluation}>
             Evaluate Model
           </button>
         </div>

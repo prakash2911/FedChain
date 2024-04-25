@@ -15,6 +15,11 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Load keys
 
+@app.route('/status', methods=['GET'])
+@cross_origin()
+def get_status():
+    return jsonify({}), 200
+
 @app.route('/get_public_key', methods=['GET'])
 @cross_origin()
 def get_public_key():  
@@ -91,4 +96,4 @@ def get_blocks():
         
 blockchain = Blockchain()    
 if __name__ == '__main__':
-    app.run(ssl_context=(config.certificate,config.private_key),debug=config.DEBUG)
+    app.run(host="0.0.0.0", ssl_context=(config.certificate,config.private_key),debug=config.DEBUG)

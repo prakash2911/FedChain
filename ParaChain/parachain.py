@@ -19,6 +19,11 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+@app.route('/status', methods=['GET'])
+@cross_origin()
+def get_status():
+    return jsonify({}), 200
+
 @app.route('/send_data', methods=['POST'])
 @cross_origin()
 def send_data():
