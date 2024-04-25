@@ -1,0 +1,29 @@
+FROM hyperledger/fabric-tools:latest AS fabric-tools
+
+# Setup Fabric network (You might need to include your fabric network setup commands here)
+COPY ./fabric-network-setup/ /fabric-setup/
+RUN cd /fabric-setup && ./setup.sh
+
+# Use an official Node.js runtime as a parent image for the backend
+FROM node:14-slim AS node-backend
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY ./node-backend/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the backend application
+COPY ./node-backend/ ./
+
+# Make port 3000 available to the world outside this container
+EXPOSE 5000
+
+# Copy the generated artifacts from fabric-tools to node-backend
+COPY --from=fabric-tools /fabric-setup/generated-artifacts/ ./generated-artifacts/
+
+# Define the command to run your backend application
+CMD ["node", "app.js"]

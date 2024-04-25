@@ -1,0 +1,15 @@
+{
+    "ExperimentResults": {
+        "Dataset": "MNIST",
+        "Models": {
+            "CentralizedLearning": {
+                "Accuracy": [0.512, 0.568, 0.604, 0.628, 0.653, 0.673, 0.689, 0.703, 0.715, 0.725],
+                "CommunicationRounds": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            },
+            "FederatedLearning": {
+                "Accuracy": [0.687, 0.746, 0.782, 0.807, 0.816, 0.831, 0.854, 0.865, 0.865, 0.884],
+                "CommunicationRounds": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            }
+        }
+    }
+}

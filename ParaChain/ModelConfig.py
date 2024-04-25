@@ -2,6 +2,47 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 from FederatedLearning import FederatedModel
+
+
+class CNNLSTMModel(FederatedModel):
+    def __init__(self, num_features,num_labels, lstm_output_size=64):
+        super().__init__()
+        self.MODEL_NAME = "LSTMModel"
+        
+        # CNN layers
+        self.cnn = nn.Sequential(
+            nn.Conv1d(1, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv1d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool1d(kernel_size=2),
+            nn.Conv1d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv1d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool1d(kernel_size=2),
+            nn.LSTM(128, lstm_output_size, batch_first=True),
+            nn.Dropout(0.1)
+        )
+        
+        # Fully connected layer
+        self.fc = nn.Linear(lstm_output_size, 1)  # Output size is 1 for binary classification
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # CNN forward
+        x = x.view(-1, 1, x.shape[1])  # reshape for CNN
+        x = self.cnn(x)
+        
+        # Reshape for FC layer
+        x = x[:, -1, :]  # get the last output of LSTM
+        x = self.fc(x)
+        
+        # Apply sigmoid
+        x = self.sigmoid(x)
+        
+        return x.squeeze(1)
+
 class AutoencoderWithClassifier(FederatedModel):
     def __init__(self, input_size, num_classes ):
         super().__init__()

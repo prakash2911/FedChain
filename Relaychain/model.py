@@ -1,4 +1,5 @@
 import torch
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 def evaluate_model(model, test_loader,block_data=None):
     model.eval()
@@ -13,3 +14,5 @@ def evaluate_model(model, test_loader,block_data=None):
             correct += (predicted == targets).sum().item()
     accuracy = correct / total
     return accuracy
+
+import torch
